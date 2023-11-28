@@ -73,7 +73,7 @@ describe("POST /api/users", () => {
   });
 
   it("should return an error", async () => {
-    const userWithMissingProps = { title: "Harry Potter" };
+    const userWithMissingProps = { firstname: "Marie" };
 
     const response = await request(app)
       .post("/api/users")
