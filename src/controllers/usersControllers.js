@@ -8,7 +8,7 @@ const getUsers = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(500);
+      res.sendStatus(422);
     });
 };
 
@@ -26,7 +26,7 @@ const getUsersById = (req, res) => {
   })
   .catch((err) => {
     console.error(err);
-    res.sendStatus(500);
+    res.sendStatus(422);
   });
 };
 
@@ -42,7 +42,7 @@ const postUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(500);
+      res.sendStatus(422);
     });
   };
 
@@ -64,7 +64,7 @@ const postUser = (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        res.sendStatus(500);
+        res.sendStatus(422);
       });
   };
 
