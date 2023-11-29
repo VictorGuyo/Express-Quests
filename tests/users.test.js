@@ -2,7 +2,9 @@ const request = require("supertest");
 
 const app = require("../src/app");
 
-const crypto = require("node:crypto");
+const crypto = require("crypto"); // Correction du module "node:crypto" à "crypto"
+
+const database = require("../database");
 
 describe("GET /api/users", () => {
   it("should return all users", async () => {
@@ -16,7 +18,7 @@ describe("GET /api/users", () => {
 
 describe("GET /api/users/:id", () => {
   it("should return one user", async () => {
-    const response = await request(app).get("/api/users/1");
+    const response = await request(app).get("/api/users/2");
 
     expect(response.headers["content-type"]).toMatch(/json/);
 
@@ -95,7 +97,13 @@ describe("PUT /api/users/:id", () => {
 
     const [result] = await database.query(
       "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-      [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+      [
+        newUser.firstname,
+        newUser.lastname,
+        newUser.email,
+        newUser.city,
+        newUser.language,
+      ]
     );
 
     const id = result.insertId;
@@ -137,10 +145,10 @@ describe("PUT /api/users/:id", () => {
   });
 
   it("should return an error", async () => {
-    const userWithMissingProps = { title: "Harry Potter" };
+    const userWithMissingProps = { firstname: "Harry Potter" };
 
     const response = await request(app)
-      .put(`/api/users/1`)
+      .put(`/api/users/2`)
       .send(userWithMissingProps);
 
     expect(response.status).toEqual(422);
@@ -161,6 +169,39 @@ describe("PUT /api/users/:id", () => {
   });
 });
 
-const database = require("../database")
+describe("DELETE /api/users/:id", () => {
+  it("should delete one user", async () => {
+    const newUser = {
+      firstname: "Marie",
+      lastname: "Martin",
+      email: `${crypto.randomUUID()}@wild.co`,
+      city: "Paris",
+      language: "French",
+    };
+
+    const [result] = await database.query(
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
+      [
+        newUser.firstname,
+        newUser.lastname,
+        newUser.email,
+        newUser.city,
+        newUser.language,
+      ]
+    );
+
+    const id = result.insertId;
+
+    const response = await request(app).delete(`/api/users/${id}`);
+
+    expect(response.status).toEqual(204);
+  });
+
+  it("should return an error", async () => {
+    const response = await request(app).delete("/api/users/0");
+
+    expect(response.status).toEqual(404);
+  });
+});
 
 afterAll(() => database.end());
